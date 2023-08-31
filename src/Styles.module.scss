@@ -1,0 +1,18 @@
+.redBack {
+background-color: red;
+}
+
+.app {
+  background-color: #282a30;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #ccc;
+  align-items: center;
+  justify-content: center;
+}
+
+.appContent {
+  min-width: 100vw;
+  min-height: 100vh;
+}
