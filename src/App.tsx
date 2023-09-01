@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import classes from "./Styles.module.scss";
+import globalClasses from "./Styles.module.scss";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -8,15 +8,15 @@ import "@fontsource/roboto/700.css";
 import MessageTemplateEditor from "./components/MessageTemplateEditor";
 
 function App() {
-  const [isMessageEditorOpen, setIsMessageEditorOpen] = React.useState(false);
+  const [isMessageEditorOpen, setIsMessageEditorOpen] = React.useState(true); //TODO false
   return (
-    <div className={classes.app}>
+    <div className={globalClasses.app}>
       {isMessageEditorOpen ? (
-        <div className={classes.appContent}>
-          <MessageTemplateEditor/>
+        <div className={globalClasses.appContent}>
+          <MessageTemplateEditor arrVarNames={["firstname", "lastname", "company", "position"]}/>
         </div>
       ) : (
-        <button
+        <button className={globalClasses.button}
           onClick={() => {
             setIsMessageEditorOpen(true);
           }}
