@@ -7,6 +7,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import MessageTemplateEditor from "./components/MessageTemplateEditor";
 
+
 function App() {
   const [isMessageEditorOpen, setIsMessageEditorOpen] = React.useState(true); //TODO false
   return (
