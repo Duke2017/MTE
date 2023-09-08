@@ -1,13 +1,11 @@
 export type callbackOnBlurType = (
   textAreaRef: React.RefObject<HTMLTextAreaElement>,
-  setVal: React.Dispatch<React.SetStateAction<string>>,
   id: string
 ) => void;
 
 export interface IITE {
-  ifValue: string;
-  thenValue: string;
-  elseValue: string;
+  values: string[];
   callbackOnBlur: callbackOnBlurType;
-  callbackOnDelete: () => void;
+  callbackOnDelete: VoidFunction;
+  handleTextAreaChange: (event: React.ChangeEvent<HTMLTextAreaElement>, id: string) => void;
 }

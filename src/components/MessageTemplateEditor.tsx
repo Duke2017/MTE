@@ -1,9 +1,9 @@
-import { useRef, MouseEvent, RefObject, useState } from "react";
+import React, { useRef, MouseEvent, RefObject, useState } from "react";
 import globalClasses from "../Styles.module.scss";
 import TextArea from "./TextArea";
 import VariableElement from "./VariableElement";
 import ITE from "./ITE";
-import { fnUid } from "../util/fnUid";
+import { fnUid } from "../utils/fnUid";
 
 interface IProps {
   arrVarNames: string[];
@@ -12,9 +12,7 @@ interface IProps {
 interface IStateITE {
   id: string;
   type: string;
-  ifValue: string;
-  thenValue: string;
-  elseValue: string;
+  values: string[];
   parentId: string;
 }
 interface IState {
@@ -25,7 +23,6 @@ interface IState {
 }
 interface ILastUsingTextArea {
   textAreaRef: RefObject<HTMLTextAreaElement>;
-  setVal: React.Dispatch<React.SetStateAction<string>> | undefined;
   id: string;
 }
 
@@ -35,29 +32,28 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
 
   const lastUsingTextArea: ILastUsingTextArea = {
     textAreaRef: useRef<HTMLTextAreaElement>(null),
-    setVal: undefined,
     id: "",
   };
 
   // const callbackSave = (template: string[]) => {
   //   localStorage.template = template;
   // };
-  const callbackOnBlur = (
-    textAreaRef: RefObject<HTMLTextAreaElement>,
-    setVal: React.Dispatch<React.SetStateAction<string>>,
-    id: string
-  ) => {
+  const callbackOnBlur = (textAreaRef: RefObject<HTMLTextAreaElement>, id: string) => {
     lastUsingTextArea.textAreaRef = textAreaRef;
-    lastUsingTextArea.setVal = setVal;
     lastUsingTextArea.id = id;
   };
 
   const callbackOnDelete = (id: string) => {
-    setTemplate((prevTemplate) => {
-      return prevTemplate.filter((element) => {
-        return element.id !== id;
-      });
-    });
+    const updatedTemplate = [...template];
+    for (let index = 0; index < updatedTemplate.length; index++) {
+      const element = updatedTemplate[index];
+      if (element.id === id) {
+        element.ITE = undefined;
+        element.value += updatedTemplate[index + 1].value;
+        updatedTemplate.splice(index + 1, 1);
+      }
+    }
+    setTemplate(updatedTemplate);
   };
 
   const [template, setTemplate] = useState<IState[]>([{ id: fnUid(), type: "TextArea", value: "" }]);
@@ -68,28 +64,42 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
       const selectionStart = lastUsingTextArea.textAreaRef.current.selectionStart;
       const firstValue = lastUsingTextArea.textAreaRef.current.value.slice(0, selectionStart);
       const secondValue = lastUsingTextArea.textAreaRef.current.value.slice(selectionStart);
-      if (lastUsingTextArea.setVal) lastUsingTextArea.setVal(firstValue);
 
       let indexElement = 0;
       const updatedTemplate = [...template];
       updatedTemplate.some((element, index) => {
         if (element.id === lastUsingTextArea.id) {
-          indexElement = index + 1;
-          element.ITE = { id: fnUid(), type: "ITE", ifValue: "", thenValue: "", elseValue: "", parentId: "" };
+          indexElement = index;
+          element.value = firstValue;
+          element.ITE = { id: fnUid(), type: "ITE", values: ['','',''], parentId: "" };
           return true;
         }
         return false;
       });
 
-      updatedTemplate.splice(
-        indexElement,
-        0,
-        { id: fnUid(), type: "TextArea", value: secondValue }
-      );
+      updatedTemplate.splice(indexElement + 1, 0, { id: fnUid(), type: "TextArea", value: secondValue });
 
       setTemplate(updatedTemplate);
     }
   };
+
+  function handleTextAreaChange(event: React.ChangeEvent<HTMLTextAreaElement>, id: string) {
+    const updatedTemplate = [...template];
+    const searchFunc = (array: IState[]) => {
+      array.forEach((element) => {
+        if (element.id === id) {
+          element.value = event.target.value;
+        }
+        if (element.ITE) {
+        //  searchFunc(element.ITE.values)
+        }
+        return element;
+      });
+    }
+    
+    searchFunc(updatedTemplate);
+    setTemplate(updatedTemplate);
+  }
 
   return (
     <div style={{ margin: "1rem" }} className={globalClasses.vBox}>
@@ -110,21 +120,24 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
       {template.map((element) => {
         if (element.type === "TextArea") {
           return (
-            <div key={element.id} className={globalClasses.hBox}>
-              <TextArea callbackOnBlur={callbackOnBlur} value={element.value} id={element.id}></TextArea>
-            </div>
-          );
-        }
-        if (element.ITE) {
-          return (
-            <ITE
-              key={element.id}
-              ifValue=""
-              thenValue=""
-              elseValue=""
-              callbackOnBlur={callbackOnBlur}
-              callbackOnDelete={() => callbackOnDelete(element.id)}
-            ></ITE>
+            <React.Fragment key={element.id}>
+              <div className={globalClasses.hBox}>
+                <TextArea
+                  callbackOnBlur={callbackOnBlur}
+                  value={element.value}
+                  id={element.id}
+                  onChange={(e) => handleTextAreaChange(e, element.id)}
+                ></TextArea>
+              </div>
+              {element.ITE && (
+                <ITE
+                  values={element.ITE.values}
+                  callbackOnBlur={callbackOnBlur}
+                  handleTextAreaChange={handleTextAreaChange}
+                  callbackOnDelete={() => callbackOnDelete(element.id)}
+                />
+              )}
+            </React.Fragment>
           );
         }
         return null;

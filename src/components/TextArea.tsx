@@ -6,10 +6,11 @@ interface ITextArea {
   callbackOnBlur: callbackOnBlurType;
   value: string;
   id: string;
+  onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-function TextArea({ callbackOnBlur, value, id }: ITextArea) {
-  const [val, setVal] = useState(value);
+function TextArea({ callbackOnBlur, value, id, onChange }: ITextArea) {
+ // const [val, setVal] = useState(value);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const resizeTextArea = () => {
@@ -18,21 +19,17 @@ function TextArea({ callbackOnBlur, value, id }: ITextArea) {
       textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
     }
   };
-  useEffect(resizeTextArea, [val]);
-
-  function handleChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setVal(event.target.value);
-  }
+  useEffect(resizeTextArea, [value]);
 
   return (
     <textarea
       onBlur={() => {
-        callbackOnBlur(textAreaRef, setVal, id);
+        callbackOnBlur(textAreaRef, id);
       }}
       ref={textAreaRef}
       className={globalClasses.textArea}
-      value={val}
-      onChange={handleChange}
+      value={value}
+      onChange={onChange}
     />
   );
 }
