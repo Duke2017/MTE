@@ -1,36 +1,51 @@
 import React from "react";
 import globalClasses from "../Styles.module.scss";
 import TextArea from "./TextArea";
-import { fnUid } from "../utils/fnUid";
 import { IITE } from "../types";
 
-const conditionalTextStyle = { alignItems: "Center", justifyContent: "End", width: "3rem" };
-
 export default function ITE({ values, callbackOnBlur, callbackOnDelete, handleTextAreaChange }: IITE) {
-  const a1 = fnUid();
-  const a2 = fnUid();
-  const a3 = fnUid();
+  const textAreaArray = (index:number) => {
+    return (
+      <div className={globalClasses.vBox} style={{ width: "100%" }}>
+        {values[index].map((element) => {
+          return (
+            <div key={element.id} className={globalClasses.hBox}>
+              <TextArea
+                id={element.id}
+                callbackOnBlur={callbackOnBlur}
+                value={element.value}
+                onChange={(e) => handleTextAreaChange(e, element.id)}
+              ></TextArea>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
   return (
     <div className={globalClasses.hBox}>
-      <button style={{ margin: "0.5rem" }} onClick={callbackOnDelete}>X</button>
+      <button style={{ margin: "0.5rem" }} onClick={callbackOnDelete} className={globalClasses.deleteButton}>
+        X
+      </button>
+
       <div className={globalClasses.vBox} style={{ width: "100%" }}>
         <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
-          <div className={globalClasses.hBox} style={conditionalTextStyle}>
+          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`} >
             IF
           </div>
-          <TextArea id={a1} callbackOnBlur={callbackOnBlur} value={values[0]} onChange={(e) => handleTextAreaChange(e, a1)}></TextArea>
+          {textAreaArray(0)}
         </div>
         <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
-          <div className={globalClasses.hBox} style={conditionalTextStyle}>
+          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`} >
             THEN
           </div>
-          <TextArea id={a2} callbackOnBlur={callbackOnBlur} value={values[1]} onChange={(e) => handleTextAreaChange(e, a2)}></TextArea>
+          {textAreaArray(1)}
         </div>
         <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
-          <div className={globalClasses.hBox} style={conditionalTextStyle}>
+          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`} >
             ELSE
           </div>
-          <TextArea id={a3} callbackOnBlur={callbackOnBlur} value={values[2]} onChange={(e) => handleTextAreaChange(e, a3)}></TextArea>
+          {textAreaArray(2)}
         </div>
       </div>
     </div>

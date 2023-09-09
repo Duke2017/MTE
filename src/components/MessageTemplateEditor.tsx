@@ -4,23 +4,12 @@ import TextArea from "./TextArea";
 import VariableElement from "./VariableElement";
 import ITE from "./ITE";
 import { fnUid } from "../utils/fnUid";
+import { IState } from "../types";
 
 interface IProps {
   arrVarNames: string[];
 }
 
-interface IStateITE {
-  id: string;
-  type: string;
-  values: string[];
-  parentId: string;
-}
-interface IState {
-  id: string;
-  type: string;
-  value: string;
-  ITE?: IStateITE;
-}
 interface ILastUsingTextArea {
   textAreaRef: RefObject<HTMLTextAreaElement>;
   id: string;
@@ -67,18 +56,29 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
 
       let indexElement = 0;
       const updatedTemplate = [...template];
-      updatedTemplate.some((element, index) => {
-        if (element.id === lastUsingTextArea.id) {
-          indexElement = index;
-          element.value = firstValue;
-          element.ITE = { id: fnUid(), type: "ITE", values: ['','',''], parentId: "" };
-          return true;
-        }
-        return false;
-      });
+      const searchFunc = (array: IState[]) => {
+        array.some((element, index) => {
+          if (element.id === lastUsingTextArea.id) {
+            indexElement = index;
+            element.value = firstValue;
+            element.ITE = [
+              [{ id: fnUid(), type: "TextArea", value: "" }],
+              [{ id: fnUid(), type: "TextArea", value: "" }],
+              [{ id: fnUid(), type: "TextArea", value: "" }],
+            ];
+            array.splice(indexElement + 1, 0, { id: fnUid(), type: "TextArea", value: secondValue });
+            return true;
+          }
+          if (element.ITE) {
+            searchFunc(element.ITE[0]);
+            searchFunc(element.ITE[1]);
+            searchFunc(element.ITE[2]);
+          }
+          return false;
+        });
+      };
 
-      updatedTemplate.splice(indexElement + 1, 0, { id: fnUid(), type: "TextArea", value: secondValue });
-
+      searchFunc(updatedTemplate);
       setTemplate(updatedTemplate);
     }
   };
@@ -91,12 +91,13 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
           element.value = event.target.value;
         }
         if (element.ITE) {
-        //  searchFunc(element.ITE.values)
+          searchFunc(element.ITE[0]);
+          searchFunc(element.ITE[1]);
+          searchFunc(element.ITE[2]);
         }
-        return element;
       });
-    }
-    
+    };
+
     searchFunc(updatedTemplate);
     setTemplate(updatedTemplate);
   }
@@ -131,7 +132,7 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
               </div>
               {element.ITE && (
                 <ITE
-                  values={element.ITE.values}
+                  values={element.ITE}
                   callbackOnBlur={callbackOnBlur}
                   handleTextAreaChange={handleTextAreaChange}
                   callbackOnDelete={() => callbackOnDelete(element.id)}
