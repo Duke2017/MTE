@@ -3,20 +3,31 @@ import globalClasses from "../Styles.module.scss";
 import TextArea from "./TextArea";
 import { IITE } from "../types";
 
-export default function ITE({ values, callbackOnBlur, callbackOnDelete, handleTextAreaChange }: IITE) {
-  const textAreaArray = (index:number) => {
+export default function ITE({ id, values, callbackOnBlur, callbackOnDelete, handleTextAreaChange }: IITE) {
+  const textAreaArray = (index: number) => {
     return (
       <div className={globalClasses.vBox} style={{ width: "100%" }}>
         {values[index].map((element) => {
           return (
-            <div key={element.id} className={globalClasses.hBox}>
-              <TextArea
-                id={element.id}
-                callbackOnBlur={callbackOnBlur}
-                value={element.value}
-                onChange={(e) => handleTextAreaChange(e, element.id)}
-              ></TextArea>
-            </div>
+            <React.Fragment key={element.id}>
+              <div className={globalClasses.hBox}>
+                <TextArea
+                  id={element.id}
+                  callbackOnBlur={callbackOnBlur}
+                  value={element.value}
+                  onChange={(e) => handleTextAreaChange(e, element.id)}
+                ></TextArea>
+              </div>
+              {element.ITE && (
+                <ITE
+                  id={element.id}
+                  values={element.ITE}
+                  callbackOnBlur={callbackOnBlur}
+                  handleTextAreaChange={handleTextAreaChange}
+                  callbackOnDelete={callbackOnDelete}
+                />
+              )}
+            </React.Fragment>
           );
         })}
       </div>
@@ -24,27 +35,21 @@ export default function ITE({ values, callbackOnBlur, callbackOnDelete, handleTe
   };
   return (
     <div className={globalClasses.hBox}>
-      <button style={{ margin: "0.5rem" }} onClick={callbackOnDelete} className={globalClasses.deleteButton}>
+      <button style={{ margin: "0.5rem" }} onClick={() => callbackOnDelete(id)} className={globalClasses.deleteButton}>
         X
       </button>
 
       <div className={globalClasses.vBox} style={{ width: "100%" }}>
         <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
-          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`} >
-            IF
-          </div>
+          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`}>IF</div>
           {textAreaArray(0)}
         </div>
         <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
-          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`} >
-            THEN
-          </div>
+          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`}>THEN</div>
           {textAreaArray(1)}
         </div>
         <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
-          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`} >
-            ELSE
-          </div>
+          <div className={`${globalClasses.hBox} ${globalClasses.conditionText}`}>ELSE</div>
           {textAreaArray(2)}
         </div>
       </div>

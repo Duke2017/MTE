@@ -34,20 +34,28 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
 
   const callbackOnDelete = (id: string) => {
     const updatedTemplate = [...template];
-    for (let index = 0; index < updatedTemplate.length; index++) {
-      const element = updatedTemplate[index];
-      if (element.id === id) {
-        element.ITE = undefined;
-        element.value += updatedTemplate[index + 1].value;
-        updatedTemplate.splice(index + 1, 1);
+    const searchFunc = (array: IState[]) => {
+      for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        if (element.id === id) {
+          element.ITE = undefined;
+          element.value += array[index + 1].value;
+          array.splice(index + 1, 1);
+        }
+        if (element.ITE) {
+          searchFunc(element.ITE[0]);
+          searchFunc(element.ITE[1]);
+          searchFunc(element.ITE[2]);
+        }
       }
     }
+    searchFunc(updatedTemplate);
     setTemplate(updatedTemplate);
   };
 
   const [template, setTemplate] = useState<IState[]>([{ id: fnUid(), type: "TextArea", value: "" }]);
 
-  const onITEbuttonClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const onITEButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (lastUsingTextArea.textAreaRef.current) {
       const selectionStart = lastUsingTextArea.textAreaRef.current.selectionStart;
@@ -113,7 +121,7 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
       </div>
 
       <div>
-        <button className={globalClasses.button} onClick={onITEbuttonClick}>
+        <button className={globalClasses.button} onClick={onITEButtonClick}>
           IF | THEN | ELSE
         </button>
       </div>
@@ -132,10 +140,11 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
               </div>
               {element.ITE && (
                 <ITE
+                  id={element.id}
                   values={element.ITE}
                   callbackOnBlur={callbackOnBlur}
                   handleTextAreaChange={handleTextAreaChange}
-                  callbackOnDelete={() => callbackOnDelete(element.id)}
+                  callbackOnDelete={callbackOnDelete}
                 />
               )}
             </React.Fragment>
