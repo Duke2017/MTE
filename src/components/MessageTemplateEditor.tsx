@@ -4,22 +4,21 @@ import TextArea from "./TextArea";
 import VariableElement from "./VariableElement";
 import ITE from "./ITE";
 import { fnUid } from "../utils/fnUid";
-import { IState } from "../types";
+import { IState, IUsingTextArea } from "../types";
 
 interface IProps {
   arrVarNames: string[];
-}
-
-interface ILastUsingTextArea {
-  textAreaRef: RefObject<HTMLTextAreaElement>;
-  id: string;
 }
 
 export default function MessageTemplateEditor({ arrVarNames }: IProps) {
   arrVarNames = localStorage.arrVarNames ? JSON.parse(localStorage.arrVarNames) : arrVarNames;
   //const template = localStorage.template ? JSON.parse(localStorage.template) : null;
 
-  const lastUsingTextArea: ILastUsingTextArea = {
+  const lastUsingTextArea: IUsingTextArea = {
+    textAreaRef: useRef<HTMLTextAreaElement>(null),
+    id: "",
+  };
+  const firstUsingTextArea: IUsingTextArea = {
     textAreaRef: useRef<HTMLTextAreaElement>(null),
     id: "",
   };
@@ -38,8 +37,8 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
       for (let index = 0; index < array.length; index++) {
         const element = array[index];
         if (element.id === id) {
-          element.ITE = undefined;
           element.value += array[index + 1].value;
+          element.ITE = array[index + 1].ITE;
           array.splice(index + 1, 1);
         }
         if (element.ITE) {
@@ -53,28 +52,38 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
     setTemplate(updatedTemplate);
   };
 
-  const [template, setTemplate] = useState<IState[]>([{ id: fnUid(), type: "TextArea", value: "" }]);
+  const [template, setTemplate] = useState<IState[]>([{ id: fnUid(), value: "" }]);
 
   const onITEButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    if (lastUsingTextArea.textAreaRef.current) {
-      const selectionStart = lastUsingTextArea.textAreaRef.current.selectionStart;
-      const firstValue = lastUsingTextArea.textAreaRef.current.value.slice(0, selectionStart);
-      const secondValue = lastUsingTextArea.textAreaRef.current.value.slice(selectionStart);
+    const updatedTemplate = [...template];
 
+    let current = lastUsingTextArea.textAreaRef.current;
+    let id = lastUsingTextArea.id;
+    if (updatedTemplate.length === 1 && !current) {
+      current = firstUsingTextArea.textAreaRef.current;
+      id = firstUsingTextArea.id;
+    }
+
+    if (current) {
+      const selectionStart = current.selectionStart;
+      const firstValue = current.value.slice(0, selectionStart);
+      const secondValue = current.value.slice(selectionStart);
       let indexElement = 0;
-      const updatedTemplate = [...template];
       const searchFunc = (array: IState[]) => {
         array.some((element, index) => {
-          if (element.id === lastUsingTextArea.id) {
+          if (element.id === id) {
             indexElement = index;
             element.value = firstValue;
+            if (element.ITE) {
+              return true;
+            }
             element.ITE = [
-              [{ id: fnUid(), type: "TextArea", value: "" }],
-              [{ id: fnUid(), type: "TextArea", value: "" }],
-              [{ id: fnUid(), type: "TextArea", value: "" }],
+              [{ id: fnUid(), value: "" }],
+              [{ id: fnUid(), value: "" }],
+              [{ id: fnUid(), value: "" }],
             ];
-            array.splice(indexElement + 1, 0, { id: fnUid(), type: "TextArea", value: secondValue });
+            array.splice(indexElement + 1, 0, { id: fnUid(), value: secondValue });
             return true;
           }
           if (element.ITE) {
@@ -126,8 +135,7 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
         </button>
       </div>
 
-      {template.map((element) => {
-        if (element.type === "TextArea") {
+      {template.map((element, index) => {
           return (
             <React.Fragment key={element.id}>
               <div className={globalClasses.hBox}>
@@ -135,6 +143,7 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
                   callbackOnBlur={callbackOnBlur}
                   value={element.value}
                   id={element.id}
+                  firstUsingTextArea={index === 0 ? firstUsingTextArea : undefined}
                   onChange={(e) => handleTextAreaChange(e, element.id)}
                 ></TextArea>
               </div>
@@ -149,8 +158,6 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
               )}
             </React.Fragment>
           );
-        }
-        return null;
       })}
     </div>
   );

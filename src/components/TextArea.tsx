@@ -1,17 +1,21 @@
-import { ChangeEvent, useState, useRef, useEffect } from "react";
+import { ChangeEvent, useRef, useEffect } from "react";
 import globalClasses from "../Styles.module.scss";
-import { callbackOnBlurType } from "../types";
+import { callbackOnBlurType, IUsingTextArea } from "../types";
 
 interface ITextArea {
   callbackOnBlur: callbackOnBlurType;
   value: string;
   id: string;
+  firstUsingTextArea?: IUsingTextArea;
   onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-function TextArea({ callbackOnBlur, value, id, onChange }: ITextArea) {
- // const [val, setVal] = useState(value);
+function TextArea({ callbackOnBlur, value, id, onChange, firstUsingTextArea }: ITextArea) {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  if (firstUsingTextArea) {
+    firstUsingTextArea.textAreaRef = textAreaRef;
+    firstUsingTextArea.id = id;
+  }
 
   const resizeTextArea = () => {
     if (textAreaRef && textAreaRef.current) {

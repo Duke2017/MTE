@@ -13,7 +13,12 @@ export interface IITE {
 
 export interface IState {
   id: string;
-  type: string;
   value: string;
   ITE?: Array<IState[]>;
+  ref?: IUsingTextArea;
+}
+
+export interface IUsingTextArea {
+  textAreaRef: React.RefObject<HTMLTextAreaElement>;
+  id: string;
 }
