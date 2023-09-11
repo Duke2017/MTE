@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent, RefObject, useState } from "react";
+import React, { useRef, MouseEvent, RefObject, useState, useEffect } from "react";
 import globalClasses from "../Styles.module.scss";
 import TextArea from "./TextArea";
 import VariableElement from "./VariableElement";
@@ -8,11 +8,21 @@ import { IState, IUsingTextArea } from "../types";
 
 interface IProps {
   arrVarNames: string[];
+  callbackClose: VoidFunction;
+  callbackSave: (template: IState[]) => void;
 }
 
-export default function MessageTemplateEditor({ arrVarNames }: IProps) {
+export default function MessageTemplateEditor({ arrVarNames, callbackClose, callbackSave }: IProps) {
+  const [template, setTemplate] = useState<IState[]>([{ id: fnUid(), value: "" }]);
   arrVarNames = localStorage.arrVarNames ? JSON.parse(localStorage.arrVarNames) : arrVarNames;
   //const template = localStorage.template ? JSON.parse(localStorage.template) : null;
+
+  const getTemplateFromLocalStorage = () => {
+    if (localStorage.template) {
+      setTemplate(JSON.parse(localStorage.template));
+    }
+  };
+  useEffect(getTemplateFromLocalStorage, []);
 
   const lastUsingTextArea: IUsingTextArea = {
     textAreaRef: useRef<HTMLTextAreaElement>(null),
@@ -23,9 +33,37 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
     id: "",
   };
 
-  // const callbackSave = (template: string[]) => {
-  //   localStorage.template = template;
-  // };
+  const onVariableElementClick = (text: string) => {
+    const updatedTemplate = [...template];
+    let current = lastUsingTextArea.textAreaRef.current;
+    let id = lastUsingTextArea.id;
+    if (updatedTemplate.length === 1 && !current) {
+      current = firstUsingTextArea.textAreaRef.current;
+      id = firstUsingTextArea.id;
+    }
+    if (current) {
+      const selectionStart = current.selectionStart;
+      const firstValue = current.value.slice(0, selectionStart);
+      const secondValue = current.value.slice(selectionStart);
+      const searchFunc = (array: IState[]) => {
+        array.some((element) => {
+          if (element.id === id) {
+            element.value = `${firstValue}{${text}}${secondValue}`;
+            return true;
+          }
+          if (element.ITE) {
+            searchFunc(element.ITE[0]);
+            searchFunc(element.ITE[1]);
+            searchFunc(element.ITE[2]);
+          }
+          return false;
+        });
+      };
+      searchFunc(updatedTemplate);
+      setTemplate(updatedTemplate);
+    }
+  };
+
   const callbackOnBlur = (textAreaRef: RefObject<HTMLTextAreaElement>, id: string) => {
     lastUsingTextArea.textAreaRef = textAreaRef;
     lastUsingTextArea.id = id;
@@ -47,26 +85,25 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
           searchFunc(element.ITE[2]);
         }
       }
-    }
+    };
     searchFunc(updatedTemplate);
     setTemplate(updatedTemplate);
   };
 
-  const [template, setTemplate] = useState<IState[]>([{ id: fnUid(), value: "" }]);
-
   const onITEButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const updatedTemplate = [...template];
-
+    let oneTextArea = false;
     let current = lastUsingTextArea.textAreaRef.current;
     let id = lastUsingTextArea.id;
     if (updatedTemplate.length === 1 && !current) {
       current = firstUsingTextArea.textAreaRef.current;
       id = firstUsingTextArea.id;
+      oneTextArea = true;
     }
 
     if (current) {
-      const selectionStart = current.selectionStart;
+      const selectionStart = oneTextArea ? current.value.length : current.selectionStart;
       const firstValue = current.value.slice(0, selectionStart);
       const secondValue = current.value.slice(selectionStart);
       let indexElement = 0;
@@ -78,11 +115,7 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
             if (element.ITE) {
               return true;
             }
-            element.ITE = [
-              [{ id: fnUid(), value: "" }],
-              [{ id: fnUid(), value: "" }],
-              [{ id: fnUid(), value: "" }],
-            ];
+            element.ITE = [[{ id: fnUid(), value: "" }], [{ id: fnUid(), value: "" }], [{ id: fnUid(), value: "" }]];
             array.splice(indexElement + 1, 0, { id: fnUid(), value: secondValue });
             return true;
           }
@@ -125,7 +158,7 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
 
       <div className={globalClasses.hBox}>
         {arrVarNames.map((element) => {
-          return VariableElement(element);
+          return VariableElement(element, onVariableElementClick);
         })}
       </div>
 
@@ -136,29 +169,41 @@ export default function MessageTemplateEditor({ arrVarNames }: IProps) {
       </div>
 
       {template.map((element, index) => {
-          return (
-            <React.Fragment key={element.id}>
-              <div className={globalClasses.hBox}>
-                <TextArea
-                  callbackOnBlur={callbackOnBlur}
-                  value={element.value}
-                  id={element.id}
-                  firstUsingTextArea={index === 0 ? firstUsingTextArea : undefined}
-                  onChange={(e) => handleTextAreaChange(e, element.id)}
-                ></TextArea>
-              </div>
-              {element.ITE && (
-                <ITE
-                  id={element.id}
-                  values={element.ITE}
-                  callbackOnBlur={callbackOnBlur}
-                  handleTextAreaChange={handleTextAreaChange}
-                  callbackOnDelete={callbackOnDelete}
-                />
-              )}
-            </React.Fragment>
-          );
+        return (
+          <React.Fragment key={element.id}>
+            <div className={globalClasses.hBox}>
+              <TextArea
+                callbackOnBlur={callbackOnBlur}
+                value={element.value}
+                id={element.id}
+                firstUsingTextArea={index === 0 ? firstUsingTextArea : undefined}
+                onChange={(e) => handleTextAreaChange(e, element.id)}
+              ></TextArea>
+            </div>
+            {element.ITE && (
+              <ITE
+                id={element.id}
+                values={element.ITE}
+                callbackOnBlur={callbackOnBlur}
+                handleTextAreaChange={handleTextAreaChange}
+                callbackOnDelete={callbackOnDelete}
+              />
+            )}
+          </React.Fragment>
+        );
       })}
+
+      <div className={globalClasses.hBox} style={{ justifyContent: "center" }}>
+        <button className={globalClasses.button} onClick={callbackClose}>
+          Preview
+        </button>
+        <button className={globalClasses.button} onClick={() => callbackSave(template)}>
+          Save
+        </button>
+        <button className={globalClasses.button} onClick={callbackClose}>
+          Close
+        </button>
+      </div>
     </div>
   );
 }

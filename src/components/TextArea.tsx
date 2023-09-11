@@ -10,7 +10,7 @@ interface ITextArea {
   onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-function TextArea({ callbackOnBlur, value, id, onChange, firstUsingTextArea }: ITextArea) {
+export default function TextArea({ callbackOnBlur, value, id, onChange, firstUsingTextArea }: ITextArea) {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   if (firstUsingTextArea) {
     firstUsingTextArea.textAreaRef = textAreaRef;
@@ -37,5 +37,3 @@ function TextArea({ callbackOnBlur, value, id, onChange, firstUsingTextArea }: I
     />
   );
 }
-
-export default TextArea;
