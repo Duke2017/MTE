@@ -23,6 +23,7 @@ function App() {
         <div className={globalClasses.appContent}>
           <MessageTemplateEditor
             arrVarNames={["firstname", "lastname", "company", "position"]}
+            template={localStorage.template ? JSON.parse(localStorage.template) : null }
             callbackClose={callbackClose}
             callbackSave={callbackSave}
           />

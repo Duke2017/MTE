@@ -1,28 +1,24 @@
-import React, { useRef, MouseEvent, RefObject, useState, useEffect } from "react";
+import React, { useRef, MouseEvent, RefObject, useState } from "react";
 import globalClasses from "../Styles.module.scss";
 import TextArea from "./TextArea";
 import VariableElement from "./VariableElement";
 import ITE from "./ITE";
-import { fnUid } from "../utils/fnUid";
+import fnUid from "../utils/fnUid";
 import { IState, IUsingTextArea } from "../types";
+import { createPortal } from "react-dom";
+import MessagePreview from "./MessagePreview";
 
 interface IProps {
   arrVarNames: string[];
   callbackClose: VoidFunction;
   callbackSave: (template: IState[]) => void;
+  template?: IState[];
 }
 
-export default function MessageTemplateEditor({ arrVarNames, callbackClose, callbackSave }: IProps) {
-  const [template, setTemplate] = useState<IState[]>([{ id: fnUid(), value: "" }]);
+export default function MessageTemplateEditor({ arrVarNames, template, callbackClose, callbackSave }: IProps) {
+  const [templateState, setTemplateState] = useState<IState[]>(template || [{ id: fnUid(), value: "" }]);
+  const [showModal, setShowModal] = useState(false);
   arrVarNames = localStorage.arrVarNames ? JSON.parse(localStorage.arrVarNames) : arrVarNames;
-  //const template = localStorage.template ? JSON.parse(localStorage.template) : null;
-
-  const getTemplateFromLocalStorage = () => {
-    if (localStorage.template) {
-      setTemplate(JSON.parse(localStorage.template));
-    }
-  };
-  useEffect(getTemplateFromLocalStorage, []);
 
   const lastUsingTextArea: IUsingTextArea = {
     textAreaRef: useRef<HTMLTextAreaElement>(null),
@@ -34,7 +30,7 @@ export default function MessageTemplateEditor({ arrVarNames, callbackClose, call
   };
 
   const onVariableElementClick = (text: string) => {
-    const updatedTemplate = [...template];
+    const updatedTemplate = [...templateState];
     let current = lastUsingTextArea.textAreaRef.current;
     let id = lastUsingTextArea.id;
     if (updatedTemplate.length === 1 && !current) {
@@ -60,7 +56,7 @@ export default function MessageTemplateEditor({ arrVarNames, callbackClose, call
         });
       };
       searchFunc(updatedTemplate);
-      setTemplate(updatedTemplate);
+      setTemplateState(updatedTemplate);
     }
   };
 
@@ -70,7 +66,7 @@ export default function MessageTemplateEditor({ arrVarNames, callbackClose, call
   };
 
   const callbackOnDelete = (id: string) => {
-    const updatedTemplate = [...template];
+    const updatedTemplate = [...templateState];
     const searchFunc = (array: IState[]) => {
       for (let index = 0; index < array.length; index++) {
         const element = array[index];
@@ -87,12 +83,12 @@ export default function MessageTemplateEditor({ arrVarNames, callbackClose, call
       }
     };
     searchFunc(updatedTemplate);
-    setTemplate(updatedTemplate);
+    setTemplateState(updatedTemplate);
   };
 
   const onITEButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const updatedTemplate = [...template];
+    const updatedTemplate = [...templateState];
     let oneTextArea = false;
     let current = lastUsingTextArea.textAreaRef.current;
     let id = lastUsingTextArea.id;
@@ -129,12 +125,12 @@ export default function MessageTemplateEditor({ arrVarNames, callbackClose, call
       };
 
       searchFunc(updatedTemplate);
-      setTemplate(updatedTemplate);
+      setTemplateState(updatedTemplate);
     }
   };
 
   function handleTextAreaChange(event: React.ChangeEvent<HTMLTextAreaElement>, id: string) {
-    const updatedTemplate = [...template];
+    const updatedTemplate = [...templateState];
     const searchFunc = (array: IState[]) => {
       array.forEach((element) => {
         if (element.id === id) {
@@ -149,7 +145,7 @@ export default function MessageTemplateEditor({ arrVarNames, callbackClose, call
     };
 
     searchFunc(updatedTemplate);
-    setTemplate(updatedTemplate);
+    setTemplateState(updatedTemplate);
   }
 
   return (
@@ -168,7 +164,7 @@ export default function MessageTemplateEditor({ arrVarNames, callbackClose, call
         </button>
       </div>
 
-      {template.map((element, index) => {
+      {templateState.map((element, index) => {
         return (
           <React.Fragment key={element.id}>
             <div className={globalClasses.hBox}>
@@ -194,10 +190,16 @@ export default function MessageTemplateEditor({ arrVarNames, callbackClose, call
       })}
 
       <div className={globalClasses.hBox} style={{ justifyContent: "center" }}>
-        <button className={globalClasses.button} onClick={callbackClose}>
+        <button
+          className={globalClasses.button}
+          onClick={() => {
+            setShowModal(true);
+          }}
+        >
           Preview
         </button>
-        <button className={globalClasses.button} onClick={() => callbackSave(template)}>
+        {showModal && createPortal(<MessagePreview template={templateState} arrVarNames={arrVarNames} onClose={() => setShowModal(false)} />, document.body)}
+        <button className={globalClasses.button} onClick={() => callbackSave(templateState)}>
           Save
         </button>
         <button className={globalClasses.button} onClick={callbackClose}>

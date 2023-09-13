@@ -22,3 +22,7 @@ export interface IUsingTextArea {
   textAreaRef: React.RefObject<HTMLTextAreaElement>;
   id: string;
 }
+
+export type valuesType = {
+  [key: string]: string;
+}
