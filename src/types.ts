@@ -5,7 +5,7 @@ export type callbackOnBlurType = (
 
 export interface IITE {
   id: string;
-  values: Array<IState[]>;
+  values: IState[][];
   callbackOnBlur: callbackOnBlurType;
   callbackOnDelete: (id: string) => void;
   handleTextAreaChange: (event: React.ChangeEvent<HTMLTextAreaElement>, id: string) => void;
@@ -14,7 +14,7 @@ export interface IITE {
 export interface IState {
   id: string;
   value: string;
-  ITE?: Array<IState[]>;
+  ITE?: IState[][];
   ref?: IUsingTextArea;
 }
 

@@ -112,3 +112,20 @@
   border-radius: 12px;
   padding: 1rem;
 }
+
+.variablesInput {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.7rem;
+  border: 0.1rem solid gray;
+  border-radius: 2px;
+  padding: 0.2rem;
+  margin: 0.5rem;
+}
+.variablesInput input {
+  border: 0;
+  outline:none;
+}
+.variablesInput:focus-within {
+  border: 1px solid blue; 
+}

@@ -17,10 +17,7 @@ export default function MessagePreview({ onClose, arrVarNames, template }: IMess
   const [values, setValues] = useState(obj);
 
   function handleValueChange(event: React.ChangeEvent<HTMLInputElement>, key: string) {
-    // const valuesNew = {...values};
-    // valuesNew[key] = event.target.value;
-    // setValues(valuesNew);
-    setValues(prevValues => ({ ...prevValues, [key]: event.target.value }));
+    setValues((prevValues) => ({ ...prevValues, [key]: event.target.value }));
   }
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -60,13 +57,15 @@ export default function MessagePreview({ onClose, arrVarNames, template }: IMess
           Variables:
           {arrVarNames.map((el) => {
             return (
-              <input
-                key={el}
-                value={values[el]}
-                placeholder={el}
-                style={{ margin: "0.5rem" }}
-                onChange={(e) => handleValueChange(e, el)}
-              />
+              <label key={el} className={globalClasses.variablesInput}>
+                {el}
+                <input
+                  value={values[el]}
+                  placeholder={el}
+                  style={{ margin: "0.5rem" }}
+                  onChange={(e) => handleValueChange(e, el)}
+                />
+              </label>
             );
           })}
         </div>

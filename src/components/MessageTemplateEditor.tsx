@@ -18,7 +18,6 @@ interface IProps {
 export default function MessageTemplateEditor({ arrVarNames, template, callbackClose, callbackSave }: IProps) {
   const [templateState, setTemplateState] = useState<IState[]>(template || [{ id: fnUid(), value: "" }]);
   const [showModal, setShowModal] = useState(false);
-  arrVarNames = localStorage.arrVarNames ? JSON.parse(localStorage.arrVarNames) : arrVarNames;
 
   const lastUsingTextArea: IUsingTextArea = {
     textAreaRef: useRef<HTMLTextAreaElement>(null),

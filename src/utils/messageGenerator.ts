@@ -2,28 +2,38 @@ import { IState, valuesType } from "../types";
 
 export default function messageGenerator(template: IState[], values: valuesType) {
   let result = "";
+  const replaceValues = (value: string) => {
+    for (const key in values) {
+      value = value.replaceAll("{" + key + "}", values[key]);
+    }
+    return value;
+  };
   const searchFunc = (array: IState[]) => {
     array.forEach((element: IState) => {
       let value = element.value;
-      if (value === ''){
-        return;
+      value = replaceValues(value);
+      if (value) {
+        result += value + "\n";
       }
-      for (const key in values) {
-        value = value.replaceAll("{" + key + "}", values[key]);
-      }
-      result += value + "\n";
       if (element.ITE) {
-     
-        if (element.ITE[0][0].value) {
-          let value = element.ITE[0][0].value;
-          for (const key in values) {
-            value = value.replaceAll("{" + key + "}", values[key]);
-          }
-          if (value) {
-            searchFunc(element.ITE[1]);
-          } else {
-            searchFunc(element.ITE[2]);
-          }
+        const searchTrueCondition = (array : IState[]) : boolean => {
+          return array.some((el:IState) => {
+              if (replaceValues(el.value)) {
+                return true;
+              }
+              if (el.ITE) {
+                if (searchTrueCondition(el.ITE[0])) {
+                  return searchTrueCondition(el.ITE[1]);
+                } else {
+                  return searchTrueCondition(el.ITE[2]);
+                }
+              }
+            return false;
+          });
+        };
+
+        if (searchTrueCondition(element.ITE[0])) {
+          searchFunc(element.ITE[1]);
         } else {
           searchFunc(element.ITE[2]);
         }
