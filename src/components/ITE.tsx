@@ -3,7 +3,10 @@ import globalClasses from "../Styles.module.scss";
 import TextArea from "./TextArea";
 import { IITE } from "../types";
 
-export default function ITE({ id, values, callbackOnBlur, callbackOnDelete, handleTextAreaChange }: IITE) {
+export default function ITE({ id, values, callbackOnBlur, callbackOnDelete, handleTextAreaChange, visible, setVisibleTrue }: IITE) {
+  if (!visible) {
+    setVisibleTrue(id);
+  }
   const textAreaArray = (index: number) => {
     return (
       <div className={globalClasses.vBox} style={{ width: "100%" }}>
@@ -25,6 +28,8 @@ export default function ITE({ id, values, callbackOnBlur, callbackOnDelete, hand
                   callbackOnBlur={callbackOnBlur}
                   handleTextAreaChange={handleTextAreaChange}
                   callbackOnDelete={callbackOnDelete}
+                  visible={element.visibleITE}
+                  setVisibleTrue={setVisibleTrue}
                 />
               )}
             </React.Fragment>
@@ -34,7 +39,7 @@ export default function ITE({ id, values, callbackOnBlur, callbackOnDelete, hand
     );
   };
   return (
-    <div className={globalClasses.hBox}>
+    <div className={`${globalClasses.hBox} ${globalClasses.ITEBlock} ${visible ? globalClasses.ITEBlockShow : ''}`}>
       <button style={{ margin: "0.5rem" }} onClick={() => callbackOnDelete(id)} className={globalClasses.deleteButton}>
         X
       </button>

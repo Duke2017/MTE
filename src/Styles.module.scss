@@ -127,5 +127,13 @@
   outline:none;
 }
 .variablesInput:focus-within {
-  border: 1px solid blue; 
+  border: 1px solid blue;
+}
+
+.ITEBlock {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+.ITEBlockShow {
+  opacity: 1;
 }

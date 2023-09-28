@@ -9,6 +9,8 @@ export interface IITE {
   callbackOnBlur: callbackOnBlurType;
   callbackOnDelete: (id: string) => void;
   handleTextAreaChange: (event: React.ChangeEvent<HTMLTextAreaElement>, id: string) => void;
+  visible?: boolean;
+  setVisibleTrue: (id: string) => void;
 }
 
 export interface IState {
@@ -16,6 +18,7 @@ export interface IState {
   value: string;
   ITE?: IState[][];
   ref?: IUsingTextArea;
+  visibleITE?: boolean;
 }
 
 export interface IUsingTextArea {

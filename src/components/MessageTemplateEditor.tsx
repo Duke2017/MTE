@@ -16,7 +16,7 @@ interface IProps {
 }
 
 export default function MessageTemplateEditor({ arrVarNames, template, callbackClose, callbackSave }: IProps) {
-  const [templateState, setTemplateState] = useState<IState[]>(template || [{ id: fnUid(), value: "" }]);
+  const [templateState, setTemplateState] = useState<IState[]>(template || [{ id: fnUid(), value: "", visibleITE: true }]);
   const [showModal, setShowModal] = useState(false);
 
   const lastUsingTextArea: IUsingTextArea = {
@@ -85,6 +85,25 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     setTemplateState(updatedTemplate);
   };
 
+  const setVisibleTrue = (id: string) => {
+    const updatedTemplate = [...templateState];
+    const searchFunc = (array: IState[]) => {
+      for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        if (element.id === id) {
+          element.visibleITE = true;
+        }
+        if (element.ITE) {
+          searchFunc(element.ITE[0]);
+          searchFunc(element.ITE[1]);
+          searchFunc(element.ITE[2]);
+        }
+      }
+    };
+    searchFunc(updatedTemplate);
+    setTemplateState(updatedTemplate);
+  };
+
   const onITEButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const updatedTemplate = [...templateState];
@@ -110,8 +129,9 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
             if (element.ITE) {
               return true;
             }
-            element.ITE = [[{ id: fnUid(), value: "" }], [{ id: fnUid(), value: "" }], [{ id: fnUid(), value: "" }]];
-            array.splice(indexElement + 1, 0, { id: fnUid(), value: secondValue });
+            element.ITE = [[{ id: fnUid(), value: "", visibleITE: true }], [{ id: fnUid(), value: "", visibleITE: true }], [{ id: fnUid(), value: "", visibleITE: true }]];
+            array.splice(indexElement + 1, 0, { id: fnUid(), value: secondValue, visibleITE: true });
+            element.visibleITE = false;
             return true;
           }
           if (element.ITE) {
@@ -182,6 +202,8 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
                 callbackOnBlur={callbackOnBlur}
                 handleTextAreaChange={handleTextAreaChange}
                 callbackOnDelete={callbackOnDelete}
+                visible={element.visibleITE}
+                setVisibleTrue={setVisibleTrue}
               />
             )}
           </React.Fragment>
