@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import globalClasses from "../Styles.module.scss";
-import { IState, valuesType } from "../types";
-import messageGenerator from "../utils/messageGenerator";
+import globalClasses from "../../Styles.module.scss";
+import styles from "./MessagePreview.module.scss";
+import { IState, valuesType } from "../../types";
+import messageGenerator from "../../utils/messageGenerator";
 
 interface IMessagePreview {
   onClose: VoidFunction;
@@ -45,8 +46,8 @@ export default function MessagePreview({ onClose, arrVarNames, template }: IMess
   }, [onClose]);
 
   return (
-    <div className={globalClasses.modal} ref={rootRef}>
-      <div className={globalClasses.modal_dialog} ref={rootRef}>
+    <div className={styles.modal} ref={rootRef}>
+      <div className={styles.modal_dialog} ref={rootRef}>
         <div style={{ fontWeight: "bold", margin: "0.5rem" }}>Message Preview</div>
         <textarea
           disabled
@@ -57,7 +58,7 @@ export default function MessagePreview({ onClose, arrVarNames, template }: IMess
           Variables:
           {arrVarNames.map((el) => {
             return (
-              <label key={el} className={globalClasses.variablesInput}>
+              <label key={el} className={styles.variablesInput}>
                 {el}
                 <input
                   value={values[el]}

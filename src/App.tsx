@@ -9,7 +9,7 @@ import MessageTemplateEditor from "./components/MessageTemplateEditor";
 import { IState } from "./types";
 
 function App() {
-  const [isMessageEditorOpen, setIsMessageEditorOpen] = React.useState(true); //TODO false
+  const [isMessageEditorOpen, setIsMessageEditorOpen] = React.useState(false);
   const callbackSave = (template: IState[]) => {
     localStorage.template = JSON.stringify(template);
   };

@@ -1,6 +1,6 @@
 import { ChangeEvent, useRef, useEffect } from "react";
-import globalClasses from "../Styles.module.scss";
-import { callbackOnBlurType, IUsingTextArea } from "../types";
+import { callbackOnBlurType, IUsingTextArea } from "../../types";
+import styles from "./TextArea.module.scss";
 
 interface ITextArea {
   callbackOnBlur: callbackOnBlurType;
@@ -31,7 +31,7 @@ export default function TextArea({ callbackOnBlur, value, id, onChange, firstUsi
         callbackOnBlur(textAreaRef, id);
       }}
       ref={textAreaRef}
-      className={globalClasses.textArea}
+      className={styles.textArea}
       value={value}
       onChange={onChange}
     />

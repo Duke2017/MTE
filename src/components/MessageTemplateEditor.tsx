@@ -1,12 +1,12 @@
 import React, { useRef, MouseEvent, RefObject, useState } from "react";
 import globalClasses from "../Styles.module.scss";
-import TextArea from "./TextArea";
+import TextArea from "./TextArea/TextArea";
 import VariableElement from "./VariableElement";
-import ITE from "./ITE";
+import ITE from "./ITE/ITE";
 import fnUid from "../utils/fnUid";
 import { IState, IUsingTextArea } from "../types";
 import { createPortal } from "react-dom";
-import MessagePreview from "./MessagePreview";
+import MessagePreview from "./MessagePreview/MessagePreview";
 
 interface IProps {
   arrVarNames: string[];
@@ -28,6 +28,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     id: "",
   };
 
+  // adds a variable to the area where the cursor was last
   const onVariableElementClick = (text: string) => {
     const updatedTemplate = [...templateState];
     let current = lastUsingTextArea.textAreaRef.current;
@@ -59,11 +60,13 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     }
   };
 
+  // saving the last cursor location
   const callbackOnBlur = (textAreaRef: RefObject<HTMLTextAreaElement>, id: string) => {
     lastUsingTextArea.textAreaRef = textAreaRef;
     lastUsingTextArea.id = id;
   };
 
+  // delete ITE block
   const callbackOnDelete = (id: string) => {
     const updatedTemplate = [...templateState];
     const searchFunc = (array: IState[]) => {
@@ -73,6 +76,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
           element.value += array[index + 1].value;
           element.ITE = array[index + 1].ITE;
           array.splice(index + 1, 1);
+          break;
         }
         if (element.ITE) {
           searchFunc(element.ITE[0]);
@@ -85,6 +89,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     setTemplateState(updatedTemplate);
   };
 
+  // for animation
   const setVisibleTrue = (id: string) => {
     const updatedTemplate = [...templateState];
     const searchFunc = (array: IState[]) => {
@@ -92,6 +97,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
         const element = array[index];
         if (element.id === id) {
           element.visibleITE = true;
+          break;
         }
         if (element.ITE) {
           searchFunc(element.ITE[0]);
@@ -104,6 +110,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     setTemplateState(updatedTemplate);
   };
 
+  // add ITE block then press ITE button 
   const onITEButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const updatedTemplate = [...templateState];
@@ -148,6 +155,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     }
   };
 
+  // changing the value when editing a textarea
   function handleTextAreaChange(event: React.ChangeEvent<HTMLTextAreaElement>, id: string) {
     const updatedTemplate = [...templateState];
     const searchFunc = (array: IState[]) => {

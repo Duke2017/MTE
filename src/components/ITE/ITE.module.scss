@@ -1,0 +1,21 @@
+.deleteButton {
+  margin: 0.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  color: #ccc;
+  background-color: rgb(52, 53, 61);
+}
+
+.ITEBlock {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+.ITEBlockShow {
+  opacity: 1;
+}
+
+.conditionText {
+  justify-content: end;
+  width: 3rem;
+  margin-top: 1.5rem;
+}
