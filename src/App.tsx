@@ -1,19 +1,19 @@
-import React from "react";
-import "./App.css";
+import React, { useState } from "react";
 import globalClasses from "./Styles.module.scss";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import MessageTemplateEditor from "./components/MessageTemplateEditor";
+import { MessageTemplateEditor } from "./components/MessageTemplateEditor";
 import { IState } from "./types";
 
-function App() {
-  const [isMessageEditorOpen, setIsMessageEditorOpen] = React.useState(false);
+export function App() {
+  const [isMessageEditorOpen, setIsMessageEditorOpen] = useState(false);
   const callbackSave = (template: IState[]) => {
+    // it was so in task, but i prefer using localStorage.setItem()
     localStorage.template = JSON.stringify(template);
   };
-  const callbackClose = () => {
+  const onClose = () => {
     setIsMessageEditorOpen(false);
   };
 
@@ -22,9 +22,13 @@ function App() {
       {isMessageEditorOpen ? (
         <div className={globalClasses.appContent}>
           <MessageTemplateEditor
-            arrVarNames={localStorage.arrVarNames ? JSON.parse(localStorage.arrVarNames) : ["firstname", "lastname", "company", "position","mutualFirstFullName"]}
-            template={localStorage.template ? JSON.parse(localStorage.template) : null }
-            callbackClose={callbackClose}
+            arrVarNames={
+              localStorage.arrVarNames
+                ? JSON.parse(localStorage.arrVarNames)
+                : ["firstname", "lastname", "company", "position", "mutualFirstFullName"]
+            }
+            template={localStorage.template ? JSON.parse(localStorage.template) : null}
+            onClose={onClose}
             callbackSave={callbackSave}
           />
         </div>
@@ -41,5 +45,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

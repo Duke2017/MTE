@@ -1,10 +1,10 @@
-import { IState, valuesType } from "../types";
-import messageGenerator from './messageGenerator';
+import { IState, ValuesType } from "../types";
+import { messageGenerator } from './messageGenerator';
 
 describe('messageGenerator', () => {
     it('should return an empty string if template is empty', () => {
       const template: IState[] = [];
-      const values: valuesType = {};
+      const values: ValuesType = {};
       const result = messageGenerator(template, values);
       expect(result).toBe('');
     });
@@ -40,7 +40,7 @@ describe('messageGenerator', () => {
             "value": "Ana"
         }
     ];
-      const values: valuesType = {firstname: 'Bill', lastname: '', company: 'EPAM', position: ''};
+      const values: ValuesType = {firstname: 'Bill', lastname: '', company: 'EPAM', position: ''};
       const result = messageGenerator(template, values);
       expect(result).toBe('Hello, Bill\nHow are things going at EPAM?\nAna\n');
     });
@@ -100,7 +100,7 @@ describe('messageGenerator', () => {
                 "value": "Ana"
             }
         ];
-        const values: valuesType = {firstname: 'Bill', lastname: '', company1: '', company2: "GM", position: ''};
+        const values: ValuesType = {firstname: 'Bill', lastname: '', company1: '', company2: "GM", position: ''};
         const result = messageGenerator(template, values);
         expect(result).toBe('Hello, Bill\nHow are things going at GM?\nAna\n');
       });
@@ -184,7 +184,7 @@ describe('messageGenerator', () => {
                 "value": "Ana"
             }
         ];
-        const values: valuesType = {firstname: 'Bill', lastname: '', company: '', position: '', mutualFirstFullName: 'Connor'};
+        const values: ValuesType = {firstname: 'Bill', lastname: '', company: '', position: '', mutualFirstFullName: 'Connor'};
         const result = messageGenerator(template, values);
         expect(result).toBe(`Hello Bill.\nWe seem to both know Connor. I'd love to connect with you.\nAna\n`);
       });

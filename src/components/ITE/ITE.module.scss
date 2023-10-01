@@ -1,9 +1,10 @@
 .deleteButton {
   margin: 0.5rem;
-  border-radius: 0.5rem;
+  margin-right: 1.5rem;
+  border-radius: var(--border-radius-primary);
   border: none;
-  color: #ccc;
-  background-color: rgb(52, 53, 61);
+  color: var(--text-primary);
+  background-color: var(--bg-overlay-primary);
 }
 
 .ITEBlock {

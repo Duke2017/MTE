@@ -1,64 +1,72 @@
-import React, { useEffect } from "react";
+import React, { Fragment, useEffect } from "react";
 import globalClasses from "../../Styles.module.scss";
 import styles from "./ITE.module.scss";
-import TextArea from "../TextArea/TextArea";
+import { TextArea } from "../TextArea/TextArea";
 import { IITE } from "../../types";
 
-export default function ITE({ id, values, callbackOnBlur, callbackOnDelete, handleTextAreaChange, visible, setVisibleTrue }: IITE) {
-  // using callback setVisibleTrue for animation 
-  useEffect(()=>{
+export function ITE({
+  id,
+  values,
+  onBlur,
+  onDelete,
+  onTextAreaChange,
+  visible,
+  onShow,
+}: IITE) {
+  // using callback onShow for animation
+  useEffect(() => {
     if (!visible) {
-      setVisibleTrue(id);
+      onShow(id);
     }
   });
-  
+
   const textAreasArray = (index: number) => {
     return (
-      <div className={globalClasses.vBox} style={{ width: "100%" }}>
+      <div className={`${globalClasses.vBox} ${globalClasses.width100}`}>
         {values[index].map((element) => {
           return (
-            <React.Fragment key={element.id}>
+            <Fragment key={element.id}>
               <div className={globalClasses.hBox}>
                 <TextArea
                   id={element.id}
-                  callbackOnBlur={callbackOnBlur}
+                  onBlur={onBlur}
                   value={element.value}
-                  onChange={(e) => handleTextAreaChange(e, element.id)}
+                  onChange={(e) => onTextAreaChange(e, element.id)}
                 ></TextArea>
               </div>
               {element.ITE && (
                 <ITE
                   id={element.id}
                   values={element.ITE}
-                  callbackOnBlur={callbackOnBlur}
-                  handleTextAreaChange={handleTextAreaChange}
-                  callbackOnDelete={callbackOnDelete}
+                  onBlur={onBlur}
+                  onTextAreaChange={onTextAreaChange}
+                  onDelete={onDelete}
                   visible={element.visibleITE}
-                  setVisibleTrue={setVisibleTrue}
+                  onShow={onShow}
                 />
               )}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </div>
     );
   };
   return (
-    <div className={`${globalClasses.hBox} ${styles.ITEBlock} ${visible ? styles.ITEBlockShow : ''}`}>
-      <button style={{ margin: "0.5rem" }} onClick={() => callbackOnDelete(id)} className={styles.deleteButton}>
+    <div className={`${globalClasses.hBox} ${styles.ITEBlock} ${visible ? styles.ITEBlockShow : ""}`}>
+      <button onClick={() => onDelete(id)} className={`${styles.deleteButton} ${globalClasses.halfMargin}`}>
         X
       </button>
 
-      <div className={globalClasses.vBox} style={{ width: "100%" }}>
-        <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
+      <div className={`${globalClasses.vBox} ${globalClasses.width100}`}>
+        <div className={globalClasses.hBox}>
           <div className={`${globalClasses.hBox} ${styles.conditionText}`}>IF</div>
           {textAreasArray(0)}
         </div>
-        <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
+        <div className={globalClasses.hBox}>
           <div className={`${globalClasses.hBox} ${styles.conditionText}`}>THEN</div>
           {textAreasArray(1)}
         </div>
-        <div className={globalClasses.hBox} style={{ marginLeft: "1rem" }}>
+        <div className={globalClasses.hBox}>
           <div className={`${globalClasses.hBox} ${styles.conditionText}`}>ELSE</div>
           {textAreasArray(2)}
         </div>

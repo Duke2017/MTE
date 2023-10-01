@@ -1,6 +1,6 @@
-import { IState, valuesType } from "../types";
+import { IState, ValuesType } from "../types";
 
-export default function messageGenerator(template: IState[], values: valuesType) {
+export function messageGenerator(template: IState[], values: ValuesType) {
   let result = "";
   const replaceValues = (value: string) => {
     for (const key in values) {

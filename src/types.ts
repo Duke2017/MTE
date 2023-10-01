@@ -1,16 +1,18 @@
-export type callbackOnBlurType = (
-  textAreaRef: React.RefObject<HTMLTextAreaElement>,
+import { ChangeEvent, RefObject } from "react";
+
+export type CallbackOnBlurType = (
+  textAreaRef: RefObject<HTMLTextAreaElement>,
   id: string
 ) => void;
 
 export interface IITE {
   id: string;
   values: IState[][];
-  callbackOnBlur: callbackOnBlurType;
-  callbackOnDelete: (id: string) => void;
-  handleTextAreaChange: (event: React.ChangeEvent<HTMLTextAreaElement>, id: string) => void;
+  onBlur: CallbackOnBlurType;
+  onDelete: (id: string) => void;
+  onTextAreaChange: (event: ChangeEvent<HTMLTextAreaElement>, id: string) => void;
   visible?: boolean;
-  setVisibleTrue: (id: string) => void;
+  onShow: (id: string) => void;
 }
 
 export interface IState {
@@ -22,10 +24,10 @@ export interface IState {
 }
 
 export interface IUsingTextArea {
-  textAreaRef: React.RefObject<HTMLTextAreaElement>;
+  textAreaRef: RefObject<HTMLTextAreaElement>;
   id: string;
 }
 
-export type valuesType = {
+export type ValuesType = {
   [key: string]: string;
 }

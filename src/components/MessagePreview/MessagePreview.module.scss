@@ -18,7 +18,7 @@
    align-items: center;
    flex-direction: column;
    background-color: white;
-   border-radius: 12px;
+   border-radius: var(--border-radius-primary);
    padding: 1rem;
  }
 
@@ -37,4 +37,15 @@
 }
 .variablesInput:focus-within {
   border: 1px solid blue;
+}
+
+.disabledTextarea {
+  resize: none;
+  width: 100%;
+  height: 100%; 
+}
+
+.variables {
+  flex-wrap: wrap;
+  align-items: center;
 }

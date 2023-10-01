@@ -1,16 +1,16 @@
 import { ChangeEvent, useRef, useEffect } from "react";
-import { callbackOnBlurType, IUsingTextArea } from "../../types";
+import { CallbackOnBlurType, IUsingTextArea } from "../../types";
 import styles from "./TextArea.module.scss";
 
 interface ITextArea {
-  callbackOnBlur: callbackOnBlurType;
+  onBlur: CallbackOnBlurType;
   value: string;
   id: string;
   firstUsingTextArea?: IUsingTextArea;
   onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export default function TextArea({ callbackOnBlur, value, id, onChange, firstUsingTextArea }: ITextArea) {
+export function TextArea({ onBlur, value, id, onChange, firstUsingTextArea }: ITextArea) {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   if (firstUsingTextArea) {
     firstUsingTextArea.textAreaRef = textAreaRef;
@@ -28,7 +28,7 @@ export default function TextArea({ callbackOnBlur, value, id, onChange, firstUsi
   return (
     <textarea
       onBlur={() => {
-        callbackOnBlur(textAreaRef, id);
+        onBlur(textAreaRef, id);
       }}
       ref={textAreaRef}
       className={styles.textArea}

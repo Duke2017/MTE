@@ -1,22 +1,24 @@
-import React, { useRef, MouseEvent, RefObject, useState } from "react";
+import React, { useRef, MouseEvent, RefObject, useState, ChangeEvent, Fragment } from "react";
 import globalClasses from "../Styles.module.scss";
-import TextArea from "./TextArea/TextArea";
-import VariableElement from "./VariableElement";
-import ITE from "./ITE/ITE";
-import fnUid from "../utils/fnUid";
+import { TextArea } from "./TextArea/TextArea";
+import { VariableElement } from "./VariableElement";
+import { ITE } from "./ITE/ITE";
+import { uid } from "../utils/fnUid";
 import { IState, IUsingTextArea } from "../types";
 import { createPortal } from "react-dom";
-import MessagePreview from "./MessagePreview/MessagePreview";
+import { MessagePreview } from "./MessagePreview/MessagePreview";
 
 interface IProps {
   arrVarNames: string[];
-  callbackClose: VoidFunction;
+  onClose: VoidFunction;
   callbackSave: (template: IState[]) => void;
   template?: IState[];
 }
 
-export default function MessageTemplateEditor({ arrVarNames, template, callbackClose, callbackSave }: IProps) {
-  const [templateState, setTemplateState] = useState<IState[]>(template || [{ id: fnUid(), value: "", visibleITE: true }]);
+export function MessageTemplateEditor({ arrVarNames, template, onClose, callbackSave }: IProps) {
+  const [templateState, setTemplateState] = useState<IState[]>(
+    template || [{ id: uid(), value: "", visibleITE: true }]
+  );
   const [showModal, setShowModal] = useState(false);
 
   const lastUsingTextArea: IUsingTextArea = {
@@ -60,14 +62,12 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     }
   };
 
-  // saving the last cursor location
-  const callbackOnBlur = (textAreaRef: RefObject<HTMLTextAreaElement>, id: string) => {
+  const saveLastPointedTextArea = (textAreaRef: RefObject<HTMLTextAreaElement>, id: string) => {
     lastUsingTextArea.textAreaRef = textAreaRef;
     lastUsingTextArea.id = id;
   };
 
-  // delete ITE block
-  const callbackOnDelete = (id: string) => {
+  const deleteITEblock = (id: string) => {
     const updatedTemplate = [...templateState];
     const searchFunc = (array: IState[]) => {
       for (let index = 0; index < array.length; index++) {
@@ -90,7 +90,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
   };
 
   // for animation
-  const setVisibleTrue = (id: string) => {
+  const onShow = (id: string) => {
     const updatedTemplate = [...templateState];
     const searchFunc = (array: IState[]) => {
       for (let index = 0; index < array.length; index++) {
@@ -110,7 +110,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     setTemplateState(updatedTemplate);
   };
 
-  // add ITE block then press ITE button 
+  // add ITE block then press ITE button
   const onITEButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const updatedTemplate = [...templateState];
@@ -136,8 +136,12 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
             if (element.ITE) {
               return true;
             }
-            element.ITE = [[{ id: fnUid(), value: "", visibleITE: true }], [{ id: fnUid(), value: "", visibleITE: true }], [{ id: fnUid(), value: "", visibleITE: true }]];
-            array.splice(indexElement + 1, 0, { id: fnUid(), value: secondValue, visibleITE: true });
+            element.ITE = [
+              [{ id: uid(), value: "", visibleITE: true }],
+              [{ id: uid(), value: "", visibleITE: true }],
+              [{ id: uid(), value: "", visibleITE: true }],
+            ];
+            array.splice(indexElement + 1, 0, { id: uid(), value: secondValue, visibleITE: true });
             element.visibleITE = false;
             return true;
           }
@@ -155,8 +159,7 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
     }
   };
 
-  // changing the value when editing a textarea
-  function handleTextAreaChange(event: React.ChangeEvent<HTMLTextAreaElement>, id: string) {
+  function textAreaOnChange(event: ChangeEvent<HTMLTextAreaElement>, id: string) {
     const updatedTemplate = [...templateState];
     const searchFunc = (array: IState[]) => {
       array.forEach((element) => {
@@ -176,8 +179,8 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
   }
 
   return (
-    <div style={{ margin: "1rem" }} className={globalClasses.vBox}>
-      <span style={{ margin: "1rem" }}>Message Template Editor</span>
+    <div className={`${globalClasses.vBox} ${globalClasses.halfMargin}`}>
+      <span className={globalClasses.halfMargin}>Message Template Editor</span>
 
       <div className={globalClasses.hBox}>
         {arrVarNames.map((element) => {
@@ -193,32 +196,32 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
 
       {templateState.map((element, index) => {
         return (
-          <React.Fragment key={element.id}>
+          <Fragment key={element.id}>
             <div className={globalClasses.hBox}>
               <TextArea
-                callbackOnBlur={callbackOnBlur}
+                onBlur={saveLastPointedTextArea}
                 value={element.value}
                 id={element.id}
                 firstUsingTextArea={index === 0 ? firstUsingTextArea : undefined}
-                onChange={(e) => handleTextAreaChange(e, element.id)}
+                onChange={(e) => textAreaOnChange(e, element.id)}
               ></TextArea>
             </div>
             {element.ITE && (
               <ITE
                 id={element.id}
                 values={element.ITE}
-                callbackOnBlur={callbackOnBlur}
-                handleTextAreaChange={handleTextAreaChange}
-                callbackOnDelete={callbackOnDelete}
+                onBlur={saveLastPointedTextArea}
+                onTextAreaChange={textAreaOnChange}
+                onDelete={deleteITEblock}
                 visible={element.visibleITE}
-                setVisibleTrue={setVisibleTrue}
+                onShow={onShow}
               />
             )}
-          </React.Fragment>
+          </Fragment>
         );
       })}
 
-      <div className={globalClasses.hBox} style={{ justifyContent: "center" }}>
+      <div className={`${globalClasses.hBox} ${globalClasses.justifyCenter}`}>
         <button
           className={globalClasses.button}
           onClick={() => {
@@ -227,11 +230,15 @@ export default function MessageTemplateEditor({ arrVarNames, template, callbackC
         >
           Preview
         </button>
-        {showModal && createPortal(<MessagePreview template={templateState} arrVarNames={arrVarNames} onClose={() => setShowModal(false)} />, document.body)}
+        {showModal &&
+          createPortal(
+            <MessagePreview template={templateState} arrVarNames={arrVarNames} onClose={() => setShowModal(false)} />,
+            document.body
+          )}
         <button className={globalClasses.button} onClick={() => callbackSave(templateState)}>
           Save
         </button>
-        <button className={globalClasses.button} onClick={callbackClose}>
+        <button className={globalClasses.button} onClick={onClose}>
           Close
         </button>
       </div>

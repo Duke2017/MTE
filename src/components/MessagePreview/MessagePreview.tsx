@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import globalClasses from "../../Styles.module.scss";
 import styles from "./MessagePreview.module.scss";
-import { IState, valuesType } from "../../types";
-import messageGenerator from "../../utils/messageGenerator";
+import { IState, ValuesType } from "../../types";
+import { messageGenerator } from "../../utils/messageGenerator";
 
 interface IMessagePreview {
   onClose: VoidFunction;
@@ -10,14 +10,16 @@ interface IMessagePreview {
   template: IState[];
 }
 
-export default function MessagePreview({ onClose, arrVarNames, template }: IMessagePreview) {
-  const obj: valuesType = {};
-  arrVarNames.forEach((el) => {
-    obj[el] = "";
+export function MessagePreview({ onClose, arrVarNames, template }: IMessagePreview) {
+  const [values, setValues] = useState(() => {
+    const obj: ValuesType = {};
+    arrVarNames.forEach((el) => {
+      obj[el] = "";
+    });
+    return obj;
   });
-  const [values, setValues] = useState(obj);
 
-  function handleValueChange(event: React.ChangeEvent<HTMLInputElement>, key: string) {
+  function handleValueChange(event: ChangeEvent<HTMLInputElement>, key: string) {
     setValues((prevValues) => ({ ...prevValues, [key]: event.target.value }));
   }
 
@@ -48,13 +50,9 @@ export default function MessagePreview({ onClose, arrVarNames, template }: IMess
   return (
     <div className={styles.modal} ref={rootRef}>
       <div className={styles.modal_dialog} ref={rootRef}>
-        <div style={{ fontWeight: "bold", margin: "0.5rem" }}>Message Preview</div>
-        <textarea
-          disabled
-          style={{ resize: "none", width: "100%", height: "100%" }}
-          value={messageGenerator(template, values)}
-        ></textarea>
-        <div className={globalClasses.hBox} style={{ margin: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+        <div className={`${globalClasses.halfMargin} ${globalClasses.fontBold}`}>Message Preview</div>
+        <textarea disabled className={styles.disabledTextarea} value={messageGenerator(template, values)}></textarea>
+        <div className={`${globalClasses.hBox} ${globalClasses.halfMargin} ${styles.variables}`}>
           Variables:
           {arrVarNames.map((el) => {
             return (
@@ -63,7 +61,7 @@ export default function MessagePreview({ onClose, arrVarNames, template }: IMess
                 <input
                   value={values[el]}
                   placeholder={el}
-                  style={{ margin: "0.5rem" }}
+                  className={globalClasses.halfMargin}
                   onChange={(e) => handleValueChange(e, el)}
                 />
               </label>
