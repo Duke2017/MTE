@@ -8,7 +8,7 @@ export function messageGenerator(template: IState[], values: ValuesType) {
     }
     return value;
   };
-  const searchFunc = (array: IState[]) => {
+  const searchElement = (array: IState[]) => {
     array.forEach((element: IState) => {
       let value = element.value;
       value = replaceValues(value);
@@ -33,13 +33,13 @@ export function messageGenerator(template: IState[], values: ValuesType) {
         };
 
         if (searchTrueCondition(element.ITE[0])) {
-          searchFunc(element.ITE[1]);
+          searchElement(element.ITE[1]);
         } else {
-          searchFunc(element.ITE[2]);
+          searchElement(element.ITE[2]);
         }
       }
     });
   };
-  searchFunc(template);
+  searchElement(template);
   return result;
 }

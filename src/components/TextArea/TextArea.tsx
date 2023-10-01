@@ -12,6 +12,7 @@ interface ITextArea {
 
 export function TextArea({ onBlur, value, id, onChange, firstUsingTextArea }: ITextArea) {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  // save ref and id in firstUsingTextArea if it first element 
   if (firstUsingTextArea) {
     firstUsingTextArea.textAreaRef = textAreaRef;
     firstUsingTextArea.id = id;

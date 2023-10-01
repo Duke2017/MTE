@@ -43,21 +43,21 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
       const selectionStart = current.selectionStart;
       const firstValue = current.value.slice(0, selectionStart);
       const secondValue = current.value.slice(selectionStart);
-      const searchFunc = (array: IState[]) => {
+      const searchElement = (array: IState[]) => {
         array.some((element) => {
           if (element.id === id) {
             element.value = `${firstValue}{${text}}${secondValue}`;
             return true;
           }
           if (element.ITE) {
-            searchFunc(element.ITE[0]);
-            searchFunc(element.ITE[1]);
-            searchFunc(element.ITE[2]);
+            searchElement(element.ITE[0]);
+            searchElement(element.ITE[1]);
+            searchElement(element.ITE[2]);
           }
           return false;
         });
       };
-      searchFunc(updatedTemplate);
+      searchElement(updatedTemplate);
       setTemplateState(updatedTemplate);
     }
   };
@@ -69,7 +69,7 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
 
   const deleteITEblock = (id: string) => {
     const updatedTemplate = [...templateState];
-    const searchFunc = (array: IState[]) => {
+    const searchElement = (array: IState[]) => {
       for (let index = 0; index < array.length; index++) {
         const element = array[index];
         if (element.id === id) {
@@ -79,20 +79,20 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
           break;
         }
         if (element.ITE) {
-          searchFunc(element.ITE[0]);
-          searchFunc(element.ITE[1]);
-          searchFunc(element.ITE[2]);
+          searchElement(element.ITE[0]);
+          searchElement(element.ITE[1]);
+          searchElement(element.ITE[2]);
         }
       }
     };
-    searchFunc(updatedTemplate);
+    searchElement(updatedTemplate);
     setTemplateState(updatedTemplate);
   };
 
   // for animation
   const onShow = (id: string) => {
     const updatedTemplate = [...templateState];
-    const searchFunc = (array: IState[]) => {
+    const searchElement = (array: IState[]) => {
       for (let index = 0; index < array.length; index++) {
         const element = array[index];
         if (element.id === id) {
@@ -100,13 +100,13 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
           break;
         }
         if (element.ITE) {
-          searchFunc(element.ITE[0]);
-          searchFunc(element.ITE[1]);
-          searchFunc(element.ITE[2]);
+          searchElement(element.ITE[0]);
+          searchElement(element.ITE[1]);
+          searchElement(element.ITE[2]);
         }
       }
     };
-    searchFunc(updatedTemplate);
+    searchElement(updatedTemplate);
     setTemplateState(updatedTemplate);
   };
 
@@ -128,7 +128,7 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
       const firstValue = current.value.slice(0, selectionStart);
       const secondValue = current.value.slice(selectionStart);
       let indexElement = 0;
-      const searchFunc = (array: IState[]) => {
+      const searchElement = (array: IState[]) => {
         array.some((element, index) => {
           if (element.id === id) {
             indexElement = index;
@@ -146,35 +146,35 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
             return true;
           }
           if (element.ITE) {
-            searchFunc(element.ITE[0]);
-            searchFunc(element.ITE[1]);
-            searchFunc(element.ITE[2]);
+            searchElement(element.ITE[0]);
+            searchElement(element.ITE[1]);
+            searchElement(element.ITE[2]);
           }
           return false;
         });
       };
 
-      searchFunc(updatedTemplate);
+      searchElement(updatedTemplate);
       setTemplateState(updatedTemplate);
     }
   };
 
   function textAreaOnChange(event: ChangeEvent<HTMLTextAreaElement>, id: string) {
     const updatedTemplate = [...templateState];
-    const searchFunc = (array: IState[]) => {
+    const searchElement = (array: IState[]) => {
       array.forEach((element) => {
         if (element.id === id) {
           element.value = event.target.value;
         }
         if (element.ITE) {
-          searchFunc(element.ITE[0]);
-          searchFunc(element.ITE[1]);
-          searchFunc(element.ITE[2]);
+          searchElement(element.ITE[0]);
+          searchElement(element.ITE[1]);
+          searchElement(element.ITE[2]);
         }
       });
     };
 
-    searchFunc(updatedTemplate);
+    searchElement(updatedTemplate);
     setTemplateState(updatedTemplate);
   }
 
