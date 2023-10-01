@@ -21,6 +21,7 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
   );
   const [showModal, setShowModal] = useState(false);
 
+  // we don't need it in state, it's normal that it will be cleared when rerender
   const lastUsingTextArea: IUsingTextArea = {
     textAreaRef: useRef<HTMLTextAreaElement>(null),
     id: "",
@@ -30,7 +31,7 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
     id: "",
   };
 
-  // adds a variable to the area where the cursor was last
+  // add a variable to the area where the cursor was last
   const onVariableElementClick = (text: string) => {
     const updatedTemplate = [...templateState];
     let current = lastUsingTextArea.textAreaRef.current;
