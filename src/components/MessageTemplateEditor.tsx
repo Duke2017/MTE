@@ -48,6 +48,8 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
         array.some((element) => {
           if (element.id === id) {
             element.value = `${firstValue}{${text}}${secondValue}`;
+            current?.focus();
+            current?.setSelectionRange(selectionStart,selectionStart);
             return true;
           }
           if (element.ITE) {
@@ -128,22 +130,24 @@ export function MessageTemplateEditor({ arrVarNames, template, onClose, callback
       const selectionStart = oneTextArea ? current.value.length : current.selectionStart;
       const firstValue = current.value.slice(0, selectionStart);
       const secondValue = current.value.slice(selectionStart);
-      let indexElement = 0;
       const searchElement = (array: IState[]) => {
         array.some((element, index) => {
           if (element.id === id) {
-            indexElement = index;
-            element.value = firstValue;
+            let existingITE;
             if (element.ITE) {
-              return true;
+              existingITE = element.ITE;
             }
+            element.value = firstValue;
             element.ITE = [
               [{ id: uid(), value: "", visibleITE: true }],
               [{ id: uid(), value: "", visibleITE: true }],
               [{ id: uid(), value: "", visibleITE: true }],
             ];
-            array.splice(indexElement + 1, 0, { id: uid(), value: secondValue, visibleITE: true });
+            array.splice(index + 1, 0, { id: uid(), value: secondValue, visibleITE: true });
             element.visibleITE = false;
+            if (existingITE) array[index + 1].ITE = existingITE;
+            current?.focus();
+            current?.setSelectionRange(selectionStart,selectionStart);
             return true;
           }
           if (element.ITE) {

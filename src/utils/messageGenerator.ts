@@ -10,11 +10,7 @@ export function messageGenerator(template: IState[], values: ValuesType) {
   };
   const searchElement = (array: IState[]) => {
     array.forEach((element: IState) => {
-      let value = element.value;
-      value = replaceValues(value);
-      if (value) {
-        result += value + "\n";
-      }
+      result += element.value;
       if (element.ITE) {
         const searchTrueCondition = (array : IState[]) : boolean => {
           return array.some((el:IState) => {
@@ -41,5 +37,6 @@ export function messageGenerator(template: IState[], values: ValuesType) {
     });
   };
   searchElement(template);
+  result = replaceValues(result);
   return result;
 }
